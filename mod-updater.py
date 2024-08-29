@@ -1,10 +1,9 @@
-__version__ = '0.1'
+__version__ = '0.2'
 
-import json
-import sys
 import hashlib
 import argparse
 import requests
+from requests.exceptions import HTTPError
 import os
 import logging
 
