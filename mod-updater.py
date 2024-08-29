@@ -7,15 +7,9 @@ from requests.exceptions import HTTPError
 import os
 import logging
 
-mod_loaders = ['fabric', 'forge', 'neoforge', 'quilt', 'liteloader', 'reisugami', 'rift']
-
 parser = argparse.ArgumentParser(
     prog='Minecraft Mod Updater',
     description='Gets your minecraft mods and them updates')
-parser.add_argument(
-    'loader', metavar='loader',
-    action='store', type=str,
-    choices=mod_loaders, help=f'The type of mod loader used (choices: {', '.join(mod_loaders)}')
 parser.add_argument(
     'gameversion', metavar='gameversion',
     action='store', type=str,
