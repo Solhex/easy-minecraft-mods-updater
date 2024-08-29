@@ -58,6 +58,17 @@ def get_sha1(
 #     mod_info = request.json()
 #
 #     return mod_info
+def download_file(url, path='./') -> str:
+    """Downloads a file from a URL."""
+    filename = url.split('/')[-1]
+    logger.info(f'Downloading {filename}')
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(os.path.join(path, filename), 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    return filename
+
 
 
 def update_mod(
