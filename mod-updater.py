@@ -41,30 +41,30 @@ def get_sha1(
 
     return sha1.hexdigest()
 
-def get_mod_file_info(
-        mod_hash,
-        mod_hash_type='sha1',
-        api_url=mod_api_url,
-        header=None) -> tuple | None:
-    """Gets the ID of a mod from its file."""
-    if header is None:
-        header = {}
-    logger.debug(f'Using header: {header}')
-
-    request = requests.get(
-        f'{api_url}/version_file/{mod_hash}',
-        params={'algorithm': mod_hash_type},
-        headers=header
-    )
-    logger.info(f'Getting the info of hash {mod_hash} with algorithm {mod_hash_type}')
-
-    if '200' not in str(request):
-        logger.warning(f'Mod info not found! Request info:\n{str(request)}')
-        return None
-
-    mod_info = request.json()
-
-    return mod_info
+# def get_mod_file_info(
+#         mod_hash,
+#         mod_hash_type='sha1',
+#         api_url=mod_api_url,
+#         header=None) -> tuple | None:
+#     """Gets the ID of a mod from its file."""
+#     if header is None:
+#         header = {}
+#     logger.debug(f'Using header: {header}')
+#
+#     request = requests.get(
+#         f'{api_url}/version_file/{mod_hash}',
+#         params={'algorithm': mod_hash_type},
+#         headers=header
+#     )
+#     logger.info(f'Getting the info of hash {mod_hash} with algorithm {mod_hash_type}')
+#
+#     if request.status_code != 200:
+#         logger.warning(f'Mod info not found! Status info: {request.status_code}')
+#         return None
+#
+#     mod_info = request.json()
+#
+#     return mod_info
 
 
 def update_mod(
