@@ -81,9 +81,6 @@ def bulk_mod_update_info(
         mod_hash_list: list,
         game_version: str,
         loader: str,
-        header=None) -> None:
-    """Updates a mod."""
-    requests.post()
         mod_hash_type='sha1',
         api_url=mod_api_url,
         header=None) -> dict:
@@ -119,6 +116,25 @@ def bulk_mod_update_info(
         return response.json()
     return {}
 
+def update_mod(
+        update_link: str,
+        old_mod_file_name: str,
+        mod_dir='./mods',
+        delete_old_mod=True):
+    """Downloads a mod and replaces it if needed"""
+    try:
+        download_file(update_link, path=mod_dir)
+    except HTTPError as err:
+        logger.error(f'HTTP error occurred: {err}')
+        print(f'[Error] HTTP error occurred: {err}')
+    except Exception as err:
+        logger.critical(f'Unexpected error occurred: {err}')
+        print(f'[Critical] Unexpected error occurred: {err}')
+
+    if delete_old_mod:
+        os.remove(os.path.join(mod_dir, old_mod_file_name))
+        logger.info(f'Deleted old mod file: {old_mod_file_name}')
+        print(f'Deleted old mod file: {old_mod_file_name}')
 
 
 def main():
