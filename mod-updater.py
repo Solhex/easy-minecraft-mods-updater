@@ -34,30 +34,6 @@ def get_sha1(
 
     return sha1.hexdigest()
 
-# def get_mod_file_info(
-#         mod_hash,
-#         mod_hash_type='sha1',
-#         api_url=mod_api_url,
-#         header=None) -> tuple | None:
-#     """Gets the ID of a mod from its file."""
-#     if header is None:
-#         header = {}
-#     logger.debug(f'Using header: {header}')
-#
-#     request = requests.get(
-#         f'{api_url}/version_file/{mod_hash}',
-#         params={'algorithm': mod_hash_type},
-#         headers=header
-#     )
-#     logger.info(f'Getting the info of hash {mod_hash} with algorithm {mod_hash_type}')
-#
-#     if request.status_code != 200:
-#         logger.warning(f'Mod info not found! Status info: {request.status_code}')
-#         return None
-#
-#     mod_info = request.json()
-#
-#     return mod_info
 def download_file(url, path='./') -> str:
     """Downloads a file from a URL."""
     filename = url.split('/')[-1]
@@ -69,10 +45,40 @@ def download_file(url, path='./') -> str:
                 f.write(chunk)
     return filename
 
+def bulk_mod_info(
+        mod_hash_list: list,
+        mod_hash_type='sha1',
+        api_url=mod_api_url,
+        header=None) -> tuple | None:
+    """Gets the information of multiple mods."""
+    logger.debug(f'Starting bulk_mod_info')
+    if header is None:
+        header = {}
+    logger.debug(f'Using header: {header}')
 
+    body = {
+        'hashes': mod_hash_list,
+        'algorithm': mod_hash_type
+    }
+    logger.debug(f'JSON body: {body}')
+    try:
+        response = requests.post(
+            f'{api_url}/version_files',
+            json=body,
+            headers=header
+        )
+    except HTTPError as err:
+        logger.error(f'HTTP error occurred: {err}')
+        logger.debug(response.text)
+        print(f'[Error] Error occurred when locating updates: {err}')
+    except Exception as err:
+        logger.critical(f'Unexpected error occurred: {err}')
+        print(f'[Critical] Unexpected error occurred: {err}')
 
-def update_mod(
-        mod_hash: str,
+    return response.json()
+
+def bulk_mod_update_info(
+        mod_hash_list: list,
         game_version: str,
         loader: str,
         header=None) -> None:
