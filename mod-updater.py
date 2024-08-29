@@ -84,6 +84,41 @@ def bulk_mod_update_info(
         header=None) -> None:
     """Updates a mod."""
     requests.post()
+        mod_hash_type='sha1',
+        api_url=mod_api_url,
+        header=None) -> dict:
+    """Gets the update information of a bunch of mods using a list
+    of their hashes.
+    """
+    logger.debug(f'Starting bulk_mod_update_info')
+    if header is None:
+        header = {}
+    logger.debug(f'Using header: {header}')
+
+    body = {
+        'hashes': mod_hash_list,
+        'algorithm': mod_hash_type,
+        'loaders': [loader],
+        'game_versions': [game_version]
+    }
+    logger.debug(f'JSON body: {body}')
+    try:
+        response = requests.post(
+            f'{api_url}/version_files/update',
+            json=body,
+            headers=header)
+        response.raise_for_status()
+    except HTTPError as err:
+        logger.error(f'HTTP error occurred: {err}')
+        logger.debug(response.text)
+        print(f'[Error] Error occurred when locating updates: {err}')
+    except Exception as err:
+        logger.critical(f'Unexpected error occurred: {err}')
+        print(f'[Critical] Unexpected error occurred: {err}')
+    else:
+        return response.json()
+    return {}
+
 
 
 def main():
