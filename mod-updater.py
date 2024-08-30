@@ -14,6 +14,12 @@ parser.add_argument(
     'gameversion', metavar='gameversion',
     action='store', type=str,
     help=f'The version of the game (e.g. 1.16.5 24w34a 1.21)')
+parser.add_argument(
+    '-k', '--keep',
+    action='store_true', help=f'Keeps the old mods')
+parser.add_argument(
+    '-V', '--version',
+    action='version', version=__version__)
 args = parser.parse_args()
 
 logger = logging.getLogger(__name__)
