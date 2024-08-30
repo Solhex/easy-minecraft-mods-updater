@@ -122,12 +122,10 @@ def bulk_mod_update_info(
         return response.json()
     return {}
 
-def update_mod(
+def download_mod(
         update_link: str,
-        old_mod_file_name: str,
-        mod_dir='./mods',
-        delete_old_mod=True):
-    """Downloads a mod and replaces it if needed"""
+        mod_dir='./mods') -> None:
+    """Downloads a mod"""
     try:
         download_file(update_link, path=mod_dir)
     except HTTPError as err:
@@ -136,12 +134,6 @@ def update_mod(
     except Exception as err:
         logger.critical(f'Unexpected error occurred: {err}')
         print(f'[Critical] Unexpected error occurred: {err}')
-
-    if delete_old_mod:
-        os.remove(os.path.join(mod_dir, old_mod_file_name))
-        logger.info(f'Deleted old mod file: {old_mod_file_name}')
-        print(f'Deleted old mod file: {old_mod_file_name}')
-
 
 def main():
     log_format = '[%(asctime)s]:[%(levelname)s]: %(message)s'
@@ -183,7 +175,6 @@ def main():
         logger.debug(f'Getting {mod} hash')
         print(f'Checking {mod} for updates')
         mod_hash = get_sha1(f'./mods/{mod}')
-        update_mod(mod_hash, game_version=args.gameversion, loader=args.loader, header=headers)
         mods_fname_dict[mod_hash] = mod
         mod_hash_list.append(mod_hash)
 
@@ -236,6 +227,7 @@ def main():
         logger.debug(f'Update link for {mods_fname_dict[mod]}: {mod_update_files[0]['url']}')
         print(f'Updating {mods_fname_dict[mod]} to {new_mod_filename}')
 
+        download_mod(mod_dl_url, mod_dir)
 
         if not args.keep:
             os.remove(os.path.join(mod_dir, mods_fname_dict[mod]))
