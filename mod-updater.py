@@ -37,7 +37,6 @@ def get_sha1(
                 break
             sha1.update(data)
     logger.debug(f'Gotten sha1 hash: {sha1.hexdigest()} from {filepath}')
-
     return sha1.hexdigest()
 
 def download_file(url, path='./') -> str:
@@ -67,6 +66,7 @@ def bulk_mod_info(
         'algorithm': mod_hash_type
     }
     logger.debug(f'JSON body: {body}')
+
     try:
         response = requests.post(
             f'{api_url}/version_files',
@@ -80,7 +80,6 @@ def bulk_mod_info(
     except Exception as err:
         logger.critical(f'Unexpected error occurred: {err}')
         print(f'[Critical] Unexpected error occurred: {err}')
-
     return response.json()
 
 def bulk_mod_update_info(
@@ -105,6 +104,7 @@ def bulk_mod_update_info(
         'game_versions': [game_version]
     }
     logger.debug(f'JSON body: {body}')
+
     try:
         response = requests.post(
             f'{api_url}/version_files/update',
@@ -149,8 +149,7 @@ def main():
         filename='mod-updater.log',
         level=logging.DEBUG,
         format=log_format,
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+        datefmt='%Y-%m-%d %H:%M:%S')
     logger.info('Script started')
     print(f'Auto mod updater script started! Version {__version__}')
 
@@ -178,8 +177,7 @@ def main():
             logger.info(f'Skipping {mod}')
             print(f'Skipping {mod}')
             continue
-
-        logger.debug(f'Checking {mod} for updates')
+        logger.debug(f'Getting {mod} hash')
         print(f'Checking {mod} for updates')
         mod_hash = get_sha1(f'./mods/{mod}')
         update_mod(mod_hash, game_version=args.gameversion, loader=args.loader, header=headers)
