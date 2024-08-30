@@ -157,12 +157,15 @@ def main():
     logger.debug(f'Current script directory: {minecraft_dir}')
 
     if minecraft_dir.split(os.sep)[-1] != '.minecraft':
-        logger.critical('Script must be in the .minecraft directory or -p set to it')
-        print('[Error] Script must be in the .minecraft directory or -p set to it')
+        logger.critical('Script must be in the .minecraft directory or -p set to it '
+                        f'was set to: {minecraft_dir}')
+        print('[Error] Script must be in the .minecraft directory or -p set to it '
+              f'was set to: {minecraft_dir}')
         exit()
     elif not os.path.isdir('./mods'):
         logger.critical('Mod folder not found')
         print('[Error] Mod folder does not exist.')
+        exit()
 
     user_agent = f'Solhex/minecraft-mod-auto-updater/{__version__} (contact@solfvern.com)'
     headers = {'User-agent': user_agent}
