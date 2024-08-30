@@ -172,6 +172,9 @@ def main():
     mod_dir = f'{script_dir}/mods'
     mod_dir_list = os.listdir(mod_dir)
     logger.debug(f'Mod dir set to: {mod_dir}')
+
+    mods_fname_dict = {}
+    mod_hash_list = []
     for mod in mod_dir_list:
         if mod.split('.')[-1] != 'jar':
             logger.info(f'Skipping {mod}')
@@ -181,6 +184,68 @@ def main():
         print(f'Checking {mod} for updates')
         mod_hash = get_sha1(f'./mods/{mod}')
         update_mod(mod_hash, game_version=args.gameversion, loader=args.loader, header=headers)
+        mods_fname_dict[mod_hash] = mod
+        mod_hash_list.append(mod_hash)
+
+    if not mod_hash_list:
+        logger.error('No mods found!')
+        print('No mods found!')
+        exit()
+    
+    mods_info = bulk_mod_info(mod_hash_list)
+    logger.debug(f'Bulk mods info: {mods_info}')
+
+    loader_mods_dict = {}
+    mods_loader_dict = {}
+    mods_update_info = {}
+    for mod in mods_info:
+        loader = mods_info[mod]['loaders'][0]
+        if loader not in loader_mods_dict:
+            loader_mods_dict[loader] = [mod]
+            mods_update_info[loader] = {}
+        else:
+            loader_mods_dict[loader].append(mod)
+        mods_loader_dict[mod] = loader
+    logger.debug(f'Loader mods dict: {loader_mods_dict}')
+    logger.debug(f'Mods loader dict: {mods_loader_dict}')
+
+    for loader in loader_mods_dict:
+        mods_update_info[loader] = bulk_mod_update_info(
+            loader_mods_dict[loader],
+            game_version=args.gameversion,
+            loader=loader,
+            header=headers)
+        logger.debug(f'Bulk updated mods info for {loader}: {mods_update_info[loader]}')
+        if mods_update_info == {}:
+            print(f'No updates found for can be performed for {loader} due to error')
+            exit()
+    logger.debug(f'Mods update info: {mods_update_info}')
+
+    mods_updated_count = 0
+    for mod in mod_hash_list:
+        logger.info(f'Checking {mods_fname_dict[mod]} ({mod}) for updates')
+        mod_update_files = mods_update_info[mods_loader_dict[mod]][mod]['files']
+        mod_dl_url = mod_update_files[0]['url']
+        new_mod_filename = mod_update_files[0]['filename']
+
+        if mod == mod_update_files[0]['hashes']['sha1']:
+            logger.info(f'Mod {mods_fname_dict[mod]} is already updated')
+            print(f'Mod {mods_fname_dict[mod]} is already updated')
+            continue
+
+        logger.debug(f'Update link for {mods_fname_dict[mod]}: {mod_update_files[0]['url']}')
+        print(f'Updating {mods_fname_dict[mod]} to {new_mod_filename}')
+
+
+        if not args.keep:
+            os.remove(os.path.join(mod_dir, mods_fname_dict[mod]))
+            logger.info(f'Deleted old mod file: {mods_fname_dict[mod]}')
+            print(f'Deleted old mod file: {mods_fname_dict[mod]}')
+
+        mods_updated_count += 1
+
+    logger.info(f'{mods_updated_count} mods updated successfully')
+    print(f'{mods_updated_count} mods updated successfully')
 
 
 if __name__ == '__main__':
