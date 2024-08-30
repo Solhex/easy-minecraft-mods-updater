@@ -1,4 +1,4 @@
-__version__ = '0.2'
+__version__ = '1.1'
 
 import hashlib
 import argparse
@@ -13,10 +13,15 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     'gameversion', metavar='gameversion',
     action='store', type=str,
-    help=f'The version of the game (e.g. 1.16.5 24w34a 1.21)')
+    help='The version of the game (e.g. 1.16.5 24w34a 1.21)')
+parser.add_argument(
+    '-p', '--path',
+    metavar='path', action='store',
+    type=str, help='Path to the .minecraft path, '
+                   'if not used script will assume its in the .minecraft folder')
 parser.add_argument(
     '-k', '--keep',
-    action='store_true', help=f'Keeps the old mods')
+    action='store_true', help='Keeps the old mods')
 parser.add_argument(
     '-V', '--version',
     action='version', version=__version__)
@@ -144,18 +149,18 @@ def main():
         datefmt='%Y-%m-%d %H:%M:%S')
     logger.info('Script started')
     print(f'Auto mod updater script started! Version {__version__}')
+    logger.debug(f'Script args: {args}')
 
     script_dir = os.path.split(os.path.realpath(__file__))[0]
     logger.debug(f'Current script directory: {script_dir}')
 
-    # if script_dir.split(os.sep)[-1] != '.minecraft':
-    #     logger.critical('Script not in the .minecraft directory')
-    #     print('[Error] Script must be in the .minecraft directory.')
-    #     exit()
-    # elif os.path.isdir('./mods') == False:
-    #     logger.critical('Mod folder not found')
-    #     print('[Error] Mod folder does not exist.')
-    logger.debug(args)
+    if script_dir.split(os.sep)[-1] != '.minecraft' and args.path is None:
+        logger.critical('Script not in the .minecraft directory')
+        print('[Error] Script must be in the .minecraft directory or -p set to it')
+        exit()
+    elif not os.path.isdir('./mods'):
+        logger.critical('Mod folder not found')
+        print('[Error] Mod folder does not exist.')
 
     user_agent = f'Solhex/minecraft-mod-auto-updater/{__version__} (contact@solfvern.com)'
     headers = {'User-agent': user_agent}
