@@ -144,18 +144,20 @@ def main():
     log_format = '[%(asctime)s]:[%(levelname)s]: %(message)s'
     logging.basicConfig(
         filename='mod-updater.log',
-        level=logging.DEBUG,
+        level=logging.INFO,
         format=log_format,
         datefmt='%Y-%m-%d %H:%M:%S')
     logger.info('Script started')
     print(f'Auto mod updater script started! Version {__version__}')
     logger.debug(f'Script args: {args}')
 
-    script_dir = os.path.split(os.path.realpath(__file__))[0]
-    logger.debug(f'Current script directory: {script_dir}')
+    minecraft_dir = os.path.split(os.path.realpath(__file__))[0]
+    if args.path is not None:
+        minecraft_dir = os.path.normpath(args.path)
+    logger.debug(f'Current script directory: {minecraft_dir}')
 
-    if script_dir.split(os.sep)[-1] != '.minecraft' and args.path is None:
-        logger.critical('Script not in the .minecraft directory')
+    if minecraft_dir.split(os.sep)[-1] != '.minecraft':
+        logger.critical('Script must be in the .minecraft directory or -p set to it')
         print('[Error] Script must be in the .minecraft directory or -p set to it')
         exit()
     elif not os.path.isdir('./mods'):
@@ -166,7 +168,7 @@ def main():
     headers = {'User-agent': user_agent}
     logger.debug(f'Set header to: {headers}')
 
-    mod_dir = f'{script_dir}/mods'
+    mod_dir = f'{minecraft_dir}/mods'
     mod_dir_list = os.listdir(mod_dir)
     logger.debug(f'Mod dir set to: {mod_dir}')
 
@@ -184,7 +186,7 @@ def main():
         mod_hash_list.append(mod_hash)
 
     if not mod_hash_list:
-        logger.error('No mods found!')
+        logger.warning('No mods found!')
         print('No mods found!')
         exit()
     
