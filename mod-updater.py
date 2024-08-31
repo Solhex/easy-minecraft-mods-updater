@@ -1,13 +1,26 @@
 __version__ = '1.1.1'
 
+import logging
+from logging.handlers import RotatingFileHandler
 import hashlib
 import argparse
 import requests
 from requests.exceptions import HTTPError
 import os
-import logging
-
 from apis.modrinth_api import ModrinthApi
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+log_file = './logs/mod-updater.log'
+file_handler = RotatingFileHandler(
+    log_file, mode='a',
+    maxBytes=5*1024*1024, backupCount=2)
+formatter = logging.Formatter(
+    '[%(asctime)s]:[%(levelname)s]: %(message)s',
+    '%Y-%m-%d %H:%M:%S')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 parser = argparse.ArgumentParser(
     prog='Minecraft Mod Updater',
@@ -28,9 +41,6 @@ parser.add_argument(
     '-V', '--version',
     action='version', version=__version__)
 args = parser.parse_args()
-
-logger = logging.getLogger(__name__)
-mod_api_url = (r'https://api.modrinth.com/v2')
 
 def get_sha1(
         filepath,
@@ -71,12 +81,6 @@ def download_mod(
         print(f'[Critical] Unexpected error occurred: {err}')
 
 def main():
-    log_format = '[%(asctime)s]:[%(levelname)s]: %(message)s'
-    logging.basicConfig(
-        filename='mod-updater.log',
-        level=logging.INFO,
-        format=log_format,
-        datefmt='%Y-%m-%d %H:%M:%S')
     logger.info('Script started')
     print(f'Auto mod updater script started! Version {__version__}')
     logger.debug(f'Script args: {args}')
