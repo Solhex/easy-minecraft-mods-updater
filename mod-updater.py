@@ -87,10 +87,10 @@ def main():
     logger.debug(f'Current script directory: {minecraft_dir}')
 
     if minecraft_dir.split(os.sep)[-1] != '.minecraft':
-        logger.critical('Script must be in the .minecraft directory or -p set to it '
-                        f'was set to: {minecraft_dir}')
-        print('[Error] Script must be in the .minecraft directory or -p set to it '
-              f'was set to: {minecraft_dir}')
+        logger.critical('Either script must be in the .minecraft directory or have -p set to it. '
+                        f'Was set to: {minecraft_dir}')
+        print('[Error] Script must be in the .minecraft directory or -p set to it. '
+              f'Was set to: {minecraft_dir}')
         exit()
     elif not os.path.isdir('./mods'):
         logger.critical('Mod folder not found')
