@@ -42,11 +42,11 @@ class ModrinthApi:
             api_headers=HEADERS,
             default_hash_type='sha1'):
         """Constructor method"""
-        logger.debug('Starting ModrinthApi')
+        logger.info('Starting ModrinthApi')
         self.api_url = mod_api_url
         self.headers = api_headers
         self.hash_type = default_hash_type
-        logger.debug(f'Modrinth API URL: {self.api_url}')
+        logger.info(f'Modrinth API URL: {self.api_url}')
 
     def _make_post_request(
             self,
@@ -71,7 +71,7 @@ class ModrinthApi:
             logger.error(f'Request exception occurred: {err}')
             return {'error': 'Failed to retrieve data. See log for more details.'}
 
-        logger.debug(f'Request: {response.request.method} {response.request.url} - '
+        logger.info(f'Request: {response.request.method} {response.request.url} - '
                      f'Status: {response.status_code}')
         logger.debug(f'Request headers: {response.request.headers}')
         logger.debug(f'Request body: {response.request.body}')
@@ -90,7 +90,7 @@ class ModrinthApi:
             may return empty dictionary if an error occurs
         :rtype: dict
         """
-        logger.debug(f'Starting get_multiple_mods_details')
+        logger.info(f'Starting get_multiple_mods_details')
         body = {
             'hashes': mod_hash_list,
             'algorithm': self.hash_type
@@ -119,7 +119,7 @@ class ModrinthApi:
             may return empty dictionary if an error occurs
         :rtype: dict
         """
-        logger.debug(f'Starting get_multiple_mods_update_info')
+        logger.info(f'Starting get_multiple_mods_update_info')
         body = {
             'hashes': mod_hash_list,
             'algorithm': self.hash_type,
