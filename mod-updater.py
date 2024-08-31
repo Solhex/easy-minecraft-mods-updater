@@ -85,18 +85,20 @@ def main():
     print(f'Auto mod updater script started! Version {__version__}')
     logger.debug(f'Script args: {args}')
 
-    minecraft_dir = os.path.split(os.path.realpath(__file__))[0]
+    script_dir = os.path.split(os.path.realpath(__file__))[0]
+    minecraft_dir = os.path.normpath(os.path.join(script_dir, '..'))
     if args.path is not None:
         minecraft_dir = os.path.normpath(args.path)
-    logger.debug(f'Current script directory: {minecraft_dir}')
+    logger.debug(f'Current script directory: {script_dir}')
+    logger.debug(f'Current minecraft directory: {minecraft_dir}')
 
-    if minecraft_dir.split(os.sep)[-1] != '.minecraft':
-        logger.critical('Either script must be in the .minecraft directory or have -p set to it. '
+    if minecraft_dir.split(os.sep)[-1] != '.minecraft' and args.path is None:
+        logger.critical('Either script folder must be in the .minecraft directory or -p must be set. '
                         f'Was set to: {minecraft_dir}')
-        print('[Error] Script must be in the .minecraft directory or -p set to it. '
+        print('[Error] Script folder must be in the .minecraft directory or -p must be set. '
               f'Was set to: {minecraft_dir}')
         exit()
-    elif not os.path.isdir('./mods'):
+    if not os.path.isdir(os.path.join(minecraft_dir, 'mods')):
         logger.critical('Mod folder not found')
         print('[Error] Mod folder does not exist.')
         exit()
