@@ -1,7 +1,7 @@
 import logging
 import requests
 from requests.exceptions import HTTPError, ConnectionError, Timeout
-import os
+from . import MODRINTH_API_URL, HEADERS, LOG_MODE
 
 from . import MODRINTH_API_URL, HEADERS
 
