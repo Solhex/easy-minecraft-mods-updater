@@ -1,4 +1,4 @@
-__version__ = '1.1.3'
+__version__ = '1.2.3'
 
 import logging
 from logging.handlers import RotatingFileHandler
@@ -9,8 +9,46 @@ from requests.exceptions import HTTPError
 import os
 from apis.modrinth_api import ModrinthApi
 
+parser = argparse.ArgumentParser(
+    prog='Minecraft Mod Updater',
+    description='Gets your minecraft mods and them updates')
+parser.add_argument(
+    'gameversion', metavar='gameversion',
+    action='store', type=str,
+    help='Minecraft version to check updates for (e.g. 1.16.5 24w34a 1.21)')
+parser.add_argument(
+    '-p', '--path',
+    metavar='path', action='store',
+    type=str, help='path to the .minecraft path, '
+                   'if not used script will assume its in the .minecraft folder')
+parser.add_argument(
+    '-k', '--keep',
+    action='store_true', help='keep outdated mods')
+parser.add_argument(
+    '-log', '--log-level',
+    action='store', default='INFO',
+    type=str.lower, choices=['debug', 'info', 'warn', 'warning', 'error', 'critical'],
+    metavar='\b', help='set the log level of the program '
+         '(debug, info, warn(ing), error, critical) (default: INFO)')
+parser.add_argument(
+    '-V', '--version',
+    action='version', version=__version__)
+args = parser.parse_args()
+
+log_levels = {
+    'critical': logging.CRITICAL,
+    'error': logging.ERROR,
+    'warn': logging.WARNING,
+    'warning': logging.WARNING,
+    'info': logging.INFO,
+    'debug': logging.DEBUG
+}
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(log_levels[args.log_level])
+
+modrinth_api_logger = logging.getLogger('apis.modrinth_api')
+modrinth_api_logger.setLevel(log_levels[args.log_level])
 
 log_file = './logs/mod-updater.log'
 file_handler = RotatingFileHandler(
@@ -21,26 +59,6 @@ formatter = logging.Formatter(
     '%Y-%m-%d %H:%M:%S')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-
-parser = argparse.ArgumentParser(
-    prog='Minecraft Mod Updater',
-    description='Gets your minecraft mods and them updates')
-parser.add_argument(
-    'gameversion', metavar='gameversion',
-    action='store', type=str,
-    help='The version of the game (e.g. 1.16.5 24w34a 1.21)')
-parser.add_argument(
-    '-p', '--path',
-    metavar='path', action='store',
-    type=str, help='Path to the .minecraft path, '
-                   'if not used script will assume its in the .minecraft folder')
-parser.add_argument(
-    '-k', '--keep',
-    action='store_true', help='Keeps the old mods')
-parser.add_argument(
-    '-V', '--version',
-    action='version', version=__version__)
-args = parser.parse_args()
 
 def get_sha1(
         filepath,
