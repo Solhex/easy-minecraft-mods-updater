@@ -2,10 +2,10 @@ import logging
 from logging.handlers import RotatingFileHandler
 import requests
 from requests.exceptions import HTTPError, ConnectionError, Timeout
-from . import MODRINTH_API_URL, HEADERS, LOG_MODE
+from . import MODRINTH_API_URL, HEADERS, DEFAULT_LOG_MODE
 
 logger = logging.getLogger(__name__)
-logger.setLevel(LOG_MODE)
+logger.setLevel(DEFAULT_LOG_MODE)
 logger.propagate = False
 
 log_file = './logs/modrinth_api.log'

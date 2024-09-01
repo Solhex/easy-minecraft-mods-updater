@@ -1,4 +1,4 @@
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 
 import logging
 from logging.handlers import RotatingFileHandler
@@ -86,11 +86,13 @@ def main():
     logger.debug(f'Script args: {args}')
 
     script_dir = os.path.split(os.path.realpath(__file__))[0]
-    minecraft_dir = os.path.normpath(os.path.join(script_dir, '..'))
+    minecraft_dir = os.path.abspath(os.path.join(script_dir, '..'))
     if args.path is not None:
-        minecraft_dir = os.path.normpath(args.path)
+        minecraft_dir = os.path.abspath(args.path)
+    mod_dir = os.path.join(minecraft_dir, 'mods')
     logger.debug(f'Current script directory: {script_dir}')
     logger.debug(f'Current minecraft directory: {minecraft_dir}')
+    logger.debug(f'Minecraft mod directory: {mod_dir}')
 
     if minecraft_dir.split(os.sep)[-1] != '.minecraft' and args.path is None:
         logger.critical('Either script folder must be in the .minecraft directory or -p must be set. '
@@ -98,14 +100,13 @@ def main():
         print('[Error] Script folder must be in the .minecraft directory or -p must be set. '
               f'Was set to: {minecraft_dir}')
         exit()
-    if not os.path.isdir(os.path.join(minecraft_dir, 'mods')):
+    if not os.path.isdir(mod_dir):
         logger.critical('Mod folder not found')
         print('[Error] Mod folder does not exist.')
         exit()
 
     modrinth = ModrinthApi()
 
-    mod_dir = f'{minecraft_dir}/mods'
     mod_dir_list = os.listdir(mod_dir)
     logger.debug(f'Mod dir set to: {mod_dir}')
 
@@ -118,7 +119,7 @@ def main():
             continue
         logger.debug(f'Getting {mod} hash')
         print(f'Checking {mod} for updates')
-        mod_hash = get_sha1(f'./mods/{mod}')
+        mod_hash = get_sha1(os.path.join(mod_dir, mod))
         mods_fname_dict[mod_hash] = mod
         mod_hash_list.append(mod_hash)
 
@@ -126,7 +127,7 @@ def main():
         logger.warning('No mods found!')
         print('No mods found!')
         exit()
-    
+
     mods_info_dict = modrinth.get_multiple_mods_details(mod_hash_list)
     if 'error' in mods_info_dict.keys():
         print(f'[Error] {mods_info_dict['error']}\nNo updates can be performed quitting.')
